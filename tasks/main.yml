@@ -1,0 +1,14 @@
+---
+# tasks file for cfv.tomcat7
+- name: Instalacion base de Tomcat 7
+  import_tasks: install_tc.yml
+  when: version is defined and sec is defined
+- name: Requitos de PREPRODUCCION de TC7 
+  import_tasks: conf_logging.yml
+  when: entorno == 'PRE'
+- name: Requisitos de usuario manager
+  import_tasks: tomcat_user.xml.yml
+  when: manager_password is defined
+- name: Requisitos de roles mediante jmx
+  import_tasks: jmxremote.password.yml
+  when: monitor_password is defined and control_password is defined

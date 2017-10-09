@@ -1,0 +1,8 @@
+---
+- name: TC7002 Se establece la clave del usuario Manager en el fichero tomcat-user.xml
+  become: yes
+  become_method: sudo
+  template:
+    src: tomcat-users.xml.j2
+    dest: "{{ catalina_home }}/conf/tomcat-users.xml"
+

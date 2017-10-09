@@ -1,0 +1,60 @@
+#!/bin/bash
+#
+# tomcat
+#
+# chkconfig: 345 84 15
+# description:  Inicio de Tomcat.
+# config: /{{ software_base }}/tomcat70_01
+# processname: tomcat
+# pidfile: /{{ software_base }}/tomcat70_01/logs/tomcat.pid
+
+CATALINA_HOME="{{ catalina_home }}"
+
+# Source function library.
+. /etc/init.d/functions
+
+# Loading the configuration parameters.
+if [ -f {{ software_base }}/tomcat70_01 ]; then
+  . {{ software_base }}/tomcat70_01
+fi
+
+RETVAL=0
+
+case "$1" in
+ start)
+        if [ -f $CATALINA_HOME/bin/startup.sh ];
+          then
+            logger -s "Iniciando Tomcat"
+            /bin/su -l {{ tomcat_user }} -c $CATALINA_HOME/bin/startup.sh
+            RETVAL=$?
+            [ $RETVAL = 0 ] && touch {{ catalina_home }}/logs/tomcat.pid
+        fi
+        ;;
+ stop)
+        if [ -f $CATALINA_HOME/bin/shutdown.sh ];
+          then
+            logger -s "Parando Tomcat"
+            /bin/su -l {{ tomcat_user }} -c $CATALINA_HOME/bin/shutdown.sh
+            RETVAL=$?
+            [ $RETVAL = 0 ] && rm -f {{ catalina_home }}/logs/tomcat.pid
+        fi
+        ;;
+ restart)
+         $0 stop
+         $0 start
+         ;;
+ version)
+        if [ -f $CATALINA_HOME/bin/version.sh ];
+          then
+            logger -s "Ver version de Tomcat"
+            /bin/su -l {{ tomcat_user }} -c $CATALINA_HOME/bin/version.sh
+            RETVAL=$?
+        fi
+        ;;
+ *)
+        echo $"Usage: $0 {start|stop|restart|version}"
+        exit 1
+        ;;
+esac
+
+exit $RETVAL

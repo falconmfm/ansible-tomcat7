@@ -1,0 +1,8 @@
+---
+- name: #TC7001 Se elimina la salida a console de los logs de Tomcat ( catalina.out )
+  become: yes
+  become_method: sudo
+  lineinfile:
+    path: "{{ catalina_home }}/conf/logging.properties"
+    regexp: '^.handlers =' 
+    line: '.handlers = 1catalina.org.apache.juli.FileHandler'

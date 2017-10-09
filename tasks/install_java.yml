@@ -1,0 +1,95 @@
+---
+#  Tareas para la instalación de Tomcat 
+#  v0 Instalación inicial
+
+- name: Creación del grupo de aplicaciones 
+  become: yes
+  become_method: sudo
+  group:
+    name: "{{ tomcat_group }}"
+    
+- name: Creación del usuarios para el servicio
+  become: yes
+  become_method: sudo
+  user:
+    name: "{{ tomcat_user }}"
+    system: yes
+    home: "/import/software/{{ tomcat_user }}"
+    shell: /bin/false
+    group: "{{ tomcat_group }}"
+    createhome: no
+    state: present
+
+
+- name: Comprobamos si existe una version previamente descargada
+  stat:
+    path: "/tmp/{{ tomcat_archive }}"
+  register: version_descargada
+
+- name: Descarga tomcat "{{ version }}"
+  environment: "{{ proxy_env }}"
+  become: yes
+  become_method: sudo
+  get_url: 
+    url: "http://archive.apache.org/dist/tomcat/tomcat-7/v{{ version }}/bin/apache-tomcat-{{ version }}.tar.gz"
+    dest: "/tmp/{{ tomcat_archive }}"
+  when: not version_descargada.stat.exists
+
+- name: Comprobamos si existe el directorio destino ( solo soportamos instalación no update )
+  stat:
+    path: "{{ catalina_base }}"
+  register: version_desplegada
+
+- name: Extraer en directorio 
+  become: yes
+  become_method: sudo
+  unarchive:
+    src: "{{ item }}"
+    dest: "{{ software_base }}"
+    remote_src: True
+    mode: 0755
+    owner: "{{ tomcat_user }}"
+    group: "{{ tomcat_group }}"
+  with_items:
+    - "/tmp/{{ tomcat_archive }}" 
+  when: not version_desplegada.stat.exists
+
+- name: Creación o modificación del enlace de tomcat a la instancia desplegada
+  become: yes
+  become_method: sudo
+  file:
+    state: link
+    src: "{{ catalina_base }}"
+    dest: "{{ catalina_home }}"
+    owner: "{{ tomcat_user }}"
+    group: "{{ tomcat_group }}"
+#  when: not version_desplegada.stat.exists
+
+- name: Ponemos el script catalina.sh 
+  become: yes
+  become_method: sudo
+  template:
+    src: catalina.sh.j2
+    dest: "{{ catalina_home }}/bin/catalina.sh"
+    mode: '750'
+    owner: "{{ tomcat_user }}"
+    group: "{{ tomcat_group }}"
+
+- name: Ponemos el server.xml
+  become: yes
+  become_method: sudo
+  template:
+    src: server.xml.j2
+    dest: "{{ catalina_home }}/conf/server.xml"
+    mode: '600'
+    owner: "{{ tomcat_user }}"
+    group: "{{ tomcat_group }}"
+
+- name: Ponemos el script de arranque en su ubicación
+  become: yes
+  become_method: sudo
+  template:
+    src: tomcat.init.j2
+    dest: "/etc/init.d/{{ tomcat_instance }}"
+    mode: '750'
+
