@@ -40,6 +40,18 @@
     path: "{{ catalina_base }}"
   register: version_desplegada
 
+- name: Se crea el directorio destino si no existe
+  become: yes
+  become_method: sudo
+  file:
+    path: "{{ catalina_base }}"
+    state: directory
+    owner: "{{ tomcat_user }}"
+    group: "{{ tomcat_group }}"
+    mode: 0775
+    recurse: yes 
+  when: not version_desplegada.stat.exists
+
 - name: Extraer en directorio 
   become: yes
   become_method: sudo
@@ -92,4 +104,5 @@
     src: tomcat.init.j2
     dest: "/etc/init.d/{{ tomcat_instance }}"
     mode: '750'
+  notify: restart tomcat
 

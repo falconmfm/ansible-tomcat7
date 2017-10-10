@@ -3,4 +3,8 @@
   vars_files:
     - vars/main.yml
   roles:
+    - role: silpion.java
+      java_oracle_distribution: jdk
+      java_install_dir: /import/software
     - ansible-tomcat7
+

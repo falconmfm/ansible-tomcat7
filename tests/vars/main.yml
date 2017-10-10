@@ -1,12 +1,13 @@
 ---
 # vars file for ansible-tomcat7
 
-java_oracle_distribution: srv
-java_install_dir: '/import/software/java16_01'
-java_home: '/import/software/java16_01'
+java_oracle_distribution: jdk
+java_oracle_version: 8u131
+java_install_dir: '/import/software/'
+java_home: '/import/software/oracle/jdk1.8.0_131'
 
 entorno: 'PRE'
-software_base: '/opt'
+software_base: '/import/software'
 version: '7.0.79'
 tomcat_archive: 'apache-tomcat-{{ version }}.tar.gz'
 ver: '70'
@@ -28,7 +29,7 @@ manager_password: 'manager'
 jmx_port: '9004'
 monitor_password: 'jmxmonitor'
 control_password: 'jmxcontrol'
-ip : hostvars[inventory_hostname]['ansible_default_ipv4']['address']
+ip : '0.0.0.0'
 
 proxy_env:
   http_proxy: "{{ lookup('env', 'http_proxy') }}"

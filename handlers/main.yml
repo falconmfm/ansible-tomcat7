@@ -1,2 +1,9 @@
 ---
 # handlers file for cfv.tomcat7
+- name: restart tomcat
+  become: yes
+  become_method: sudo
+  service: 
+    name: "{{ tomcat_instance }}" 
+    state: restarted
+
