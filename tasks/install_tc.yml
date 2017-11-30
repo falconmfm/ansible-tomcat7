@@ -1,13 +1,13 @@
 ---
-#  Tareas para la instalación de Tomcat 
+#  Tareas para la instalación de Tomcat
 #  v0 Instalación inicial
 
-- name: Creación del grupo de aplicaciones 
+- name: Creación del grupo de aplicaciones
   become: yes
   become_method: sudo
   group:
     name: "{{ tomcat_group }}"
-    
+
 - name: Creación del usuarios para el servicio
   become: yes
   become_method: sudo
@@ -15,7 +15,7 @@
     name: "{{ tomcat_user }}"
     system: yes
     home: "/import/software/{{ tomcat_user }}"
-    shell: /bin/false
+    shell: /bin/bash
     group: "{{ tomcat_group }}"
     createhome: no
     state: present
@@ -26,12 +26,15 @@
     path: "/tmp/{{ tomcat_archive }}"
   register: version_descargada
 
+- debug:
+  msg: "tomcat-{{ version.split('.')[0] }}"
+
 - name: Descarga tomcat "{{ version }}"
   environment: "{{ proxy_env }}"
   become: yes
   become_method: sudo
-  get_url: 
-    url: "http://archive.apache.org/dist/tomcat/tomcat-7/v{{ version }}/bin/apache-tomcat-{{ version }}.tar.gz"
+  get_url:
+    url: "http://archive.apache.org/dist/tomcat/tomcat-{{ version.split('.')[-3] }}/v{{ version }}/bin/apache-tomcat-{{ version }}.tar.gz"
     dest: "/tmp/{{ tomcat_archive }}"
   when: not version_descargada.stat.exists
 
@@ -49,10 +52,10 @@
     owner: "{{ tomcat_user }}"
     group: "{{ tomcat_group }}"
     mode: 0775
-    recurse: yes 
+    recurse: yes
   when: not version_desplegada.stat.exists
 
-- name: Extraer en directorio 
+- name: Extraer en directorio
   become: yes
   become_method: sudo
   unarchive:
@@ -63,7 +66,7 @@
     owner: "{{ tomcat_user }}"
     group: "{{ tomcat_group }}"
   with_items:
-    - "/tmp/{{ tomcat_archive }}" 
+    - "/tmp/{{ tomcat_archive }}"
   when: not version_desplegada.stat.exists
 
 - name: Creación o modificación del enlace de tomcat a la instancia desplegada
@@ -77,15 +80,17 @@
     group: "{{ tomcat_group }}"
 #  when: not version_desplegada.stat.exists
 
-- name: Ponemos el script catalina.sh 
+- name: Ponemos el script catalina.sh
   become: yes
   become_method: sudo
   template:
     src: catalina.sh.j2
     dest: "{{ catalina_home }}/bin/catalina.sh"
-    mode: '750'
+    mode: '0750'
     owner: "{{ tomcat_user }}"
     group: "{{ tomcat_group }}"
+  tags:
+    - config
 
 - name: Ponemos el server.xml
   become: yes
@@ -93,16 +98,46 @@
   template:
     src: server.xml.j2
     dest: "{{ catalina_home }}/conf/server.xml"
-    mode: '600'
+    mode: '0600'
     owner: "{{ tomcat_user }}"
     group: "{{ tomcat_group }}"
+  tags:
+    - config
 
-- name: Ponemos el script de arranque en su ubicación
+- name: Ponemos el script de arranque en su ubicación si es RH 6.X
   become: yes
   become_method: sudo
   template:
     src: tomcat.init.j2
     dest: "/etc/init.d/{{ tomcat_instance }}"
-    mode: '750'
+    mode: '0750'
   notify: restart tomcat
+  when: (ansible_distribution_major_version == "6")
+  tags:
+    - initd
+    - config
 
+- name: Ponemos el servicio de  arranque en su ubicación si es RH 7.X
+  become: yes
+  become_method: sudo
+  template:
+    src: tomcat.systemd.j2
+    dest: "/usr/lib/systemd/system/{{ tomcat_instance }}.service"
+    mode: '0644'
+  when: (ansible_distribution_major_version == "7")
+  tags:
+    - systemd
+    - config
+
+#- name: Procedemos a recargar el systemd
+#  become: true
+#  become_method: sudo
+#  systemd:
+#    name: "{{ tomcat_instance }}.service"
+#    enabled: yes
+#    state: started
+#    masked: no
+#  notify: restart tomcat
+#  when: (ansible_distribution_major_version == "7")
+#  tags:
+#   - systemd

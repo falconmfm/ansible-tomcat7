@@ -24,6 +24,11 @@ Vagrant.configure(VAGRANT_API_VERSION) do |config|
       }
     }
   }
+  config.vm.network "forwarded_port", guest: 8080, host: 8080, id: 'tomcat_http'
+  config.vm.network "forwarded_port", guest: 8009, host: 8009, id: 'tomcat_ajp'
+  config.vm.network "forwarded_port", guest: 9004, host: 9004, id: 'tomcat_jmx'
+#  config.vm.network "forwarded_port", guest: 80, host: 8080
+  
 
   if Vagrant.has_plugin?('nugrant')
     # get defaults from cfg as user defaults
@@ -38,9 +43,9 @@ Vagrant.configure(VAGRANT_API_VERSION) do |config|
   config.vm.box = ENV['ANSIBLE_TOMCAT_VAGRANT_BOXNAME'] || c['vm']['box']
   config.vm.box_check_update = c['vm']['check_update']
 
-  config.vm.define :ansibletomcattest do |d|
+  config.vm.define :ansibletestcfvtomcat7 do |d|
 
-    d.vm.hostname = 'ansibletomcattest'
+    d.vm.hostname = 'ansibletestcfvtomcat7'
     if not c['vm']['synced_folders']
       d.vm.synced_folder '.', '/vagrant', id: 'vagrant-root', disabled: true
       d.vm.synced_folder '.', '/home/vagrant/sync', id: 'vagrant-root', disabled: true
@@ -50,13 +55,13 @@ Vagrant.configure(VAGRANT_API_VERSION) do |config|
     d.vm.provision :ansible do |ansible|
       # configure ansible-galaxy
       ansible.galaxy_roles_path = 'tests/roles/:../'
-      ansible.galaxy_role_file = 'tests/requirements.yml'
-      ansible.galaxy_command = 'ansible-galaxy install --role-file=%{role_file} --roles-path=tests/roles/ --ignore-errors --force'
+      #ansible.galaxy_role_file = 'tests/requirements.yml'
+      #ansible.galaxy_command = 'ansible-galaxy install --role-file=%{role_file} --roles-path=tests/roles/ --ignore-errors --force'
 
       # configure ansible-playbook
       ansible.playbook = 'tests/test.yml'
       ansible.groups = {
-        'vagrant' => ['ansibletomcattest']
+        'vagrant' => ['ansibletestcfvtomcat7']
       }
       ansible.limit = 'vagrant'
 
@@ -81,7 +86,7 @@ Vagrant.configure(VAGRANT_API_VERSION) do |config|
 
     d.vm.provider :virtualbox do |v|
       v.customize 'pre-boot', ['modifyvm', :id, '--nictype1', 'virtio']
-      v.customize [ 'modifyvm', :id, '--name', 'ansibletomcattest', '--memory', '1024', '--cpus', '1' ]
+      v.customize [ 'modifyvm', :id, '--name', 'ansibletestcfvtomcat7', '--memory', '1024', '--cpus', '1' ]
     end
 
     d.vm.provider :libvirt do |lv|

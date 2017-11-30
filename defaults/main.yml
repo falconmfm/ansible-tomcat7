@@ -4,7 +4,7 @@
 java_oracle_distribution: jdk
 java_oracle_version: 8u131
 java_install_dir: '/import/software/'
-java_home: '/import/software/oracle/jdk1.8.0_131'
+java_home: '/import/software/java'
 
 entorno: 'PRE'
 software_base: '/import/software'
@@ -34,3 +34,4 @@ ip : '0.0.0.0'
 proxy_env:
   http_proxy: "{{ lookup('env', 'http_proxy') }}"
   https_proxy: "{{ lookup('env', 'http_proxy') }}"
+  no_proxy: "{{ lookup('env', 'no_proxy') }}"

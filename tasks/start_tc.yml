@@ -1,0 +1,8 @@
+---
+- name: Start Tomcat 
+  become: yes
+  become_method: sudo
+  service:
+    name: "{{ tomcat_instance }}"
+    state: started
+#  when: "ansible_os_family == 'RedHat' and ansible_distribution_major_version == '6'"

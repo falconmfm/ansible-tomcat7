@@ -1,0 +1,23 @@
+---
+- name: Comprobamos si existe el directorio appdata ( solo soportamos instalación no update )
+  stat:
+    path: "{{ app_base }}"
+  register: app_desplegada
+
+- name: Se crea el directorio destino si no existe
+  become: yes
+  become_method: sudo
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ tomcat_user }}"
+    group: "{{ tomcat_group }}"
+    mode: 0775
+    recurse: yes
+  with_items:
+    - "{{ app_base }}"
+    - "{{ app_base }}/jee"
+    - "{{ app_base }}/jeeApliConf"
+    - "{{ app_base }}/jeeApliDatos"
+  when: not app_desplegada.stat.exists
+

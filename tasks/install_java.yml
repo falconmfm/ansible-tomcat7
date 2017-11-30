@@ -1,13 +1,13 @@
 ---
-#  Tareas para la instalación de Tomcat 
+#  Tareas para la instalación de Tomcat
 #  v0 Instalación inicial
 
-- name: Creación del grupo de aplicaciones 
+- name: Creación del grupo de aplicaciones
   become: yes
   become_method: sudo
   group:
     name: "{{ tomcat_group }}"
-    
+
 - name: Creación del usuarios para el servicio
   become: yes
   become_method: sudo
@@ -30,7 +30,7 @@
   environment: "{{ proxy_env }}"
   become: yes
   become_method: sudo
-  get_url: 
+  get_url:
     url: "http://archive.apache.org/dist/tomcat/tomcat-7/v{{ version }}/bin/apache-tomcat-{{ version }}.tar.gz"
     dest: "/tmp/{{ tomcat_archive }}"
   when: not version_descargada.stat.exists
@@ -40,7 +40,7 @@
     path: "{{ catalina_base }}"
   register: version_desplegada
 
-- name: Extraer en directorio 
+- name: Extraer en directorio
   become: yes
   become_method: sudo
   unarchive:
@@ -51,7 +51,7 @@
     owner: "{{ tomcat_user }}"
     group: "{{ tomcat_group }}"
   with_items:
-    - "/tmp/{{ tomcat_archive }}" 
+    - "/tmp/{{ tomcat_archive }}"
   when: not version_desplegada.stat.exists
 
 - name: Creación o modificación del enlace de tomcat a la instancia desplegada
@@ -65,7 +65,7 @@
     group: "{{ tomcat_group }}"
 #  when: not version_desplegada.stat.exists
 
-- name: Ponemos el script catalina.sh 
+- name: Ponemos el script catalina.sh
   become: yes
   become_method: sudo
   template:

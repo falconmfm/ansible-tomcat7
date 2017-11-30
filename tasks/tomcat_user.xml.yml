@@ -5,4 +5,7 @@
   template:
     src: tomcat-users.xml.j2
     dest: "{{ catalina_home }}/conf/tomcat-users.xml"
-
+  tags:
+    - config
+    - tomcat-user
+  

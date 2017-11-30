@@ -1,5 +1,0 @@
----
-- name: Test silpion/ansible-java role with current default versions
-  hosts: all
-  roles:
-    - role: ansible-java

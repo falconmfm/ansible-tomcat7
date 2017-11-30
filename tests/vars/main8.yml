@@ -1,28 +1,22 @@
 ---
-# vars file for ansible-tomcat7
-
-oracle_jdk_installation_dir: '/import/software'
+# defaults file for oracle_jdk
+oracle_jdk_oficial: true
 oracle_jdk_download_dir: 'files'
-oracle_jdk_package: 'jdk-7u80-linux-x64.tar.gz'
-oracle_jdk_package_subdir: '7u80-b15'
-oracle_jdk_version: '1.7.0_80'
-oracle_jdk_download: 'false'
+oracle_jdk_package: 'jdk-8u151-linux-x64.tar.gz'
+oracle_jdk_package_subdir: '8u151-b12'
+oracle_jdk_version: '1.8.0_151'
+oracle_jdk_installation_dir: '/import/software'
 oracle_jce_installation_dir: '{{ oracle_jdk_installation_dir }}/java/jre/lib/security'
-oracle_jce: 'true'
-oracle_jce_package: 'UnlimitedJCEPolicyJDK7.tgz'
-
-
-#java_oracle_distribution: jdk
-#java_oracle_version: 8u131
-#java_install_dir: '/import/software/'
-#java_home: '/import/software/oracle/jdk1.8.0_131'
+oracle_jce: true
+oracle_jdk_download: false
+oracle_jce_package: 'UnlimitedJCEPolicyJDK8.tgz'
 
 java_home: '{{ oracle_jdk_installation_dir }}/java'
 entorno: 'PRE'
 software_base: '/import/software'
-version: '7.0.79'
+version: '8.0.47'
 tomcat_archive: 'apache-tomcat-{{ version }}.tar.gz'
-ver: '70'
+ver: '80'
 sec: '01'
 instance: '{{ ver }}_{{ sec }}'
 tomcat_instance: 'tomcat{{ instance }}'

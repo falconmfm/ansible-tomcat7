@@ -3,7 +3,13 @@
 - name: restart tomcat
   become: yes
   become_method: sudo
-  service: 
-    name: "{{ tomcat_instance }}" 
+  service:
+    name: "{{ tomcat_instance }}"
     state: restarted
 
+- name: start tomcat
+  become: yes
+  become_method: sudo
+  service:
+    name: "{{ tomcat_instance }}"
+    state: started

@@ -3,7 +3,10 @@
 - name: Instalacion base de Tomcat 7
   import_tasks: install_tc.yml
   when: version is defined and sec is defined
-- name: Requitos de PREPRODUCCION de TC7 
+- name: Crea estructura para despliegue de app
+  import_tasks: deploy_dir.yml
+  when: app_base is defined
+- name: Requitos de PREPRODUCCION de TC7
   import_tasks: conf_logging.yml
   when: entorno == 'PRE'
 - name: Requisitos de usuario manager
@@ -12,3 +15,6 @@
 - name: Requisitos de roles mediante jmx
   import_tasks: jmxremote.password.yml
   when: monitor_password is defined and control_password is defined
+- name: Arranque final
+  import_tasks: start_tc.yml
+  

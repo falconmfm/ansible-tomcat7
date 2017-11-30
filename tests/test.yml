@@ -1,10 +1,8 @@
 ---
 - hosts: all
   vars_files:
-    - vars/main.yml
+    - vars/main8.yml
   roles:
-    - role: silpion.java
-      java_oracle_distribution: jdk
-      java_install_dir: /import/software
-    - ansible-tomcat7
+    - { role: cfv.java }
+    - { role: cfv.tomcat7 }
 
